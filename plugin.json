@@ -1,0 +1,18 @@
+{
+  "pluginName": "端口扫描",
+  "description": "一个用于扫描端口的uTools插件",
+  "main": "index.html",
+  "author": "leoskey",
+  "homepage": "http://lcrun.com",
+  "version": "0.0.1",
+  "preload": "preload.js",
+  "logo": "logo.png",
+  "features": [{
+    "code": "portscan",
+    "explain": "端口扫描",
+    "cmds": ["端口", "扫描", "端口扫描"]
+  }],
+  "development": {
+    "main": "index.html"
+  }
+}

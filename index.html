@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="./element-ui.css">
+  <style>
+    html {
+      border-top: 1px solid #ccc;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <el-form label-position="right" label-width="80px" :model="input">
+      <el-form-item label="地址：">
+        <el-input v-model="input.host" placeholder="127.0.0.1"></el-input>
+      </el-form-item>
+      <el-form-item label="端口：">
+        <el-input v-model="input.port" placeholder="80-443"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="batchScan">{{isStart?'停止扫描':'开始扫描'}}</el-button>
+      </el-form-item>
+    </el-form>
+    <el-table :data="list" height="250" border style="width: 100%" :default-sort="{prop: 'port', order: 'descending'}">
+      <el-table-column prop="port" label="端口" sortable>
+      </el-table-column>
+      <el-table-column prop="status.description" label="状态" sortable>
+      </el-table-column>
+    </el-table>
+  </div>
+  <script src="./lodash.js"></script>
+  <script src="./vue.min.js"></script>
+  <script src="./element-ui.js"></script>
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        isStart: false,
+        input: {
+          host: '',
+          port: ''
+        },
+        list: [],
+        scanner: null
+      },
+      methods: {
+        batchScan: async function () {
+          this.isStart = !this.isStart
+          if (this.isStart) {
+            const host = _.trim(this.input.host)
+            if (_.isEmpty(host)) {
+              this.isStart = false
+              return
+            }
+
+            let start = 0
+            let end = 0
+            const port = _.trim(this.input.port)
+            const portRange = port.split('-')
+            if (_.isEmpty(portRange[0])) {
+              this.isStart = false
+              return
+            }
+            else if (portRange.length === 1) {
+              start = end = parseInt(portRange[0])
+            }
+            else {
+              start = parseInt(portRange[0])
+              end = parseInt(portRange[1])
+            }
+            this.list = []
+            this.scanner = await batchScan(host, start, end, result => {
+              this.list.push(result)
+              if (result.port == end) {
+                this.isStart = false
+              }
+            })
+          } else {
+            this.scanner.stop()
+          }
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
